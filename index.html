@@ -1,321 +1,419 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Administrador de Compras</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css " rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js "></script>
-  <style>
-    body {
-      background-color: #f8f9fa;
-      padding: 2rem;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .card {
-      border: 1px solid #e9ecef;
-      border-radius: 0.75rem;
-      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
-      margin-bottom: 2rem;
-    }
-    .card-header {
-      background-color: #007bff;
-      color: #fff;
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid #0069d9;
-      border-radius: 0.75rem 0.75rem 0 0;
-      font-weight: bold;
-      font-size: 1.25rem;
-    }
-    .card-body {
-      padding: 1.5rem;
-    }
-    h1 {
-      color: #343a40;
-      margin-bottom: 2.5rem;
-      font-weight: 700;
-    }
-    h4 {
-      color: #343a40;
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-    }
-    .btn-primary, .btn-success, .btn-secondary {
-      border-radius: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      font-weight: 500;
-    }
-    .form-label {
-      font-weight: 500;
-      color: #495057;
-    }
-    .form-control, .form-select {
-      border-radius: 0.5rem;
-    }
-    .list-group-item {
-      border: 1px solid rgba(0, 0, 0, 0.125);
-      border-radius: 0.5rem;
-      margin-bottom: 0.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background-color: #fff;
-    }
-    #tablaCompras {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-      background-color: #fff;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
-    }
-    #tablaCompras th, #tablaCompras td {
-      padding: 0.75rem;
-      text-align: center;
-      border-bottom: 1px solid #e9ecef;
-    }
-    #tablaCompras th {
-      background-color: #343a40;
-      color: #fff;
-      font-weight: 600;
-    }
-    #tablaCompras tbody tr:nth-child(even) {
-      background-color: #f8f9fa;
-    }
-    #tablaCompras tbody tr:last-child td {
-      border-bottom: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unicar Talca - Experiencia Culinaria Única</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1 class="text-center">Administrador de Compras</h1>
-    <div class="row mb-4">
-      <div class="col text-end">
-        <button class="btn btn-success me-2" onclick="exportarExcel()">Exportar a Excel</button>
-        <label for="importarArchivo" class="btn btn-secondary">Importar desde Excel</label>
-        <input type="file" id="importarArchivo" accept=".xlsx, .xls" onchange="importarExcel(event)" style="display: none;">
-      </div>
-    </div>
 
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">Ingreso de Datos</div>
-          <div class="card-body">
-            <form id="formCompra">
-              <div class="mb-3">
-                <label for="fecha" class="form-label">Fecha</label>
-                <input type="date" class="form-control" id="fecha" required>
-              </div>
-              <div class="mb-3">
-                <label for="proveedor" class="form-label">Proveedor</label>
-                <input type="text" class="form-control" id="proveedor" required>
-              </div>
-              <div class="mb-3">
-                <label for="producto" class="form-label">Producto</label>
-                <input type="text" class="form-control" id="producto" required>
-              </div>
-              <div class="mb-3">
-                <label for="cantidad" class="form-label">Cantidad</label>
-                <input type="number" class="form-control" id="cantidad" required>
-              </div>
-              <div class="mb-3">
-                <label for="precioCompra" class="form-label">Precio Unitario de Compra (bruto)</label>
-                <input type="number" class="form-control" id="precioCompra" required>
-              </div>
-              <div class="mb-3">
-                <label for="precioVenta" class="form-label">Precio Unitario de Venta</label>
-                <input type="number" class="form-control" id="precioVenta" required>
-              </div>
-              <div class="mb-3">
-                <label for="tipoDoc" class="form-label">Tipo de Documento</label>
-                <select class="form-select" id="tipoDoc" required>
-                  <option value="">Seleccionar</option>
-                  <option value="Boleta">Boleta</option>
-                  <option value="Factura">Factura</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="categoria" class="form-label">Categor�a de Producto</label>
-                <input type="text" class="form-control" id="categoria">
-              </div>
-              <div class="mb-3">
-                <label for="notas" class="form-label">Notas</label>
-                <textarea class="form-control" id="notas"></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">Agregar</button>
-            </form>
-          </div>
+    <a href="https://wa.me/56912345678" class="whatsapp-float" target="_blank" aria-label="Contactar por WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="#home" class="logo">
+                <img src="https://via.placeholder.com/80x80/2C3E50/FFFFFF?text=Unicar+Logo" alt="Logo Unicar Talca" class="logo-image">
+                <span class="restaurant-name">Unicar Talca</span>
+            </a>
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="#home">Inicio</a></li>
+                    <li><a href="#menu">Menú</a></li>
+                    <li><a href="#reservas">Reservas</a></li>
+                    <li><a href="#about">Nosotros</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </div>
-      </div>
+    </header>
 
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">Resumen</div>
-          <div class="card-body">
-            <ul class="list-group">
-              <li class="list-group-item">Total Compras (Netas): $<span id="totalCompras">0</span></li>
-              <li class="list-group-item">Total Ingresos: $<span id="totalIngresos">0</span></li>
-              <li class="list-group-item">Margen Total: $<span id="totalMargen">0</span></li>
-            </ul>
-          </div>
+    <section class="hero-section" id="home">
+        <div class="hero-content">
+            <h1 class="hero-title">Restaurante Unicar Talca: Donde Cada Plato Cuenta una Historia</h1>
+            <p class="hero-subtitle">Una experiencia culinaria inigualable en el corazón de Talca. Cocina de autor con ingredientes frescos y locales.</p>
+            <div class="hero-buttons">
+                <a href="#reservas" class="btn btn-primary">Reservar una Mesa</a>
+                <a href="#menu" class="btn btn-secondary">Explorar el Menú</a>
+            </div>
         </div>
-      </div>
-    </div>
+    </section>
 
-    <div class="row mt-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">Lista de Compras</div>
-          <div class="card-body">
-            <table class="table table-bordered" id="tablaCompras">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Fecha</th>
-                  <th>Proveedor</th>
-                  <th>Producto</th>
-                  <th>Categor�a</th>
-                  <th>Cantidad</th>
-                  <th>Precio Compra Bruto</th>
-                  <th>Bruto Total</th>
-                  <th>IVA</th>
-                  <th>Neto Total</th>
-                  <th>Precio Venta</th>
-                  <th>Ingreso Total</th>
-                  <th>Margen</th>
-                  <th>Margen %</th>
-                  <th>Tipo Doc.</th>
-                  <th>Notas</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+    <section class="section-padded bg-light" id="descubre">
+        <div class="container text-center">
+            <h2 class="section-heading">Descubre la Esencia de Unicar</h2>
+            <p class="section-subheading">Fusionando la tradición con la innovación en cada bocado.</p>
+            <div class="intro-grid">
+                <div class="intro-text">
+                    <p>En **Unicar Talca**, nos enorgullece ofrecer una cocina que celebra la riqueza de los sabores chilenos con un toque moderno y sofisticado. Nuestro ambiente es una fusión de calidez rústica y elegancia contemporánea, perfecto para cualquier ocasión.</p>
+                    <p>Desde la frescura de nuestros productos hasta la pasión en cada preparación, nuestra filosofía se centra en brindar una experiencia memorable. Creemos que la buena comida es un arte y una forma de conectar, y eso es lo que encontrarás en cada rincón de Unicar.</p>
+                    <a href="#about" class="btn btn-tertiary">Conoce Más de Nuestra Historia</a>
+                </div>
+                <div class="intro-image">
+                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Interior de Unicar Talca">
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
+    </section>
 
-  <script>
-    const form = document.getElementById('formCompra');
-    const tabla = document.querySelector('#tablaCompras tbody');
-    const totalCompras = document.getElementById('totalCompras');
-    const totalIngresos = document.getElementById('totalIngresos');
-    const totalMargen = document.getElementById('totalMargen');
+    <section class="section-padded bg-dark" id="menu">
+        <div class="container">
+            <h2 class="section-heading text-white">Nuestra Carta</h2>
+            <p class="section-subheading text-light-gray">Una selección cuidadosamente curada de sabores para deleitar tu paladar.</p>
 
-    let sumCompras = 0, sumIngresos = 0, sumMargen = 0, idAuto = 1;
+            <div class="menu-categories">
+                <button class="menu-category-btn active" data-category="entradas">Aperitivos</button>
+                <button class="menu-category-btn" data-category="principales">Platos Principales</button>
+                <button class="menu-category-btn" data-category="postres">Postres</button>
+                <button class="menu-category-btn" data-category="bebidas">Bebidas</button>
+            </div>
 
-    function formatNumberWithCommas(number) {
-      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
+            <div class="menu-items-container">
+                <div class="menu-category-content" id="entradas">
+                    <div class="menu-item">
+                        <img src="img/Tabla de Quesos y Charcutería.jpg" alt="Tabla de Quesos y Charcutería">
+                        <div class="item-info">
+                            <h3>Tabla de Quesos y Charcutería</h3>
+                            <p>Selección de quesos maduros, embutidos artesanales y mermeladas de estación. <em>(Contiene lácteos, gluten)</em></p>
+                            <span class="item-price">$12.500</span>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <img src="img/Ceviche de Salmón y Mango.jpg" alt="Ceviche de Salmón y Mango">
+                        <div class="item-info">
+                            <h3>Ceviche de Salmón y Mango</h3>
+                            <p>Fresco salmón marinado en leche de tigre, con cubos de mango, cebolla morada y cilantro. <em>(Contiene pescado)</em></p>
+                            <span class="item-price">$10.900</span>
+                        </div>
+                    </div>
+                     <div class="menu-item">
+                        <img src="img/Mini Empanadas de Pino.jpg" alt="Mini Empanadas de Pino">
+                        <div class="item-info">
+                            <h3>Mini Empanadas de Pino</h3>
+                            <p>Clásicas mini empanadas chilenas de pino, horneadas a la perfección. <em>(Contiene gluten, carne)</em></p>
+                            <span class="item-price">$7.800</span>
+                        </div>
+                    </div>
+                </div>
 
-    function agregarFila(producto, cantidad, precioCompra, precioVenta, tipoDoc, fecha, proveedor, categoria, notas) {
-      cantidad = isNaN(cantidad) ? 0 : cantidad;
-      precioCompra = isNaN(precioCompra) ? 0 : precioCompra;
-      precioVenta = isNaN(precioVenta) ? 0 : precioVenta;
+                <div class="menu-category-content hidden" id="principales">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Lomo Vetado con Risotto de Champiñones">
+                        <div class="item-info">
+                            <h3>Lomo Vetado con Risotto de Champiñones</h3>
+                            <p>Corte premium de lomo vetado a la parrilla, acompañado de cremoso risotto con selección de hongos. <em>(Contiene lácteos)</em></p>
+                            <span class="item-price">$22.900</span>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1616738914652-32a82643a183?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Salmón a la Plancha con Puré Rústico de Papas">
+                        <div class="item-info">
+                            <h3>Salmón a la Plancha con Puré Rústico de Papas</h3>
+                            <p>Jugoso filete de salmón sellado, con puré de papas rústico y salsa de mantequilla cítrica. <em>(Contiene pescado, lácteos)</em></p>
+                            <span class="item-price">$19.500</span>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Pasta Fresca con Salsa Pomodoro y Burrata">
+                        <div class="item-info">
+                            <h3>Pasta Fresca con Salsa Pomodoro y Burrata</h3>
+                            <p>Fettuccine artesanal con salsa de tomates frescos, albahaca y burrata cremosa. <em>(Vegetariano. Contiene gluten, lácteos)</em></p>
+                            <span class="item-price">$15.800</span>
+                        </div>
+                    </div>
+                </div>
 
-      const brutoTotal = cantidad * precioCompra;
-      let iva = 0;
-      let netoTotal = brutoTotal;
+                <div class="menu-category-content hidden" id="postres">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1551021422-0d17d59b21f3?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Cheesecake de Frutos Rojos">
+                        <div class="item-info">
+                            <h3>Cheesecake de Frutos Rojos</h3>
+                            <p>Cremoso cheesecake horneado sobre base de galleta, cubierto con salsa de frutos rojos de la zona. <em>(Contiene lácteos, gluten)</em></p>
+                            <span class="item-price">$7.200</span>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1563813890203-d6c547ceb7d7?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Brownie con Helado de Vainilla">
+                        <div class="item-info">
+                            <h3>Brownie con Helado de Vainilla</h3>
+                            <p>Cálido brownie de chocolate belga, con una bola de helado artesanal de vainilla. <em>(Contiene lácteos, gluten)</em></p>
+                            <span class="item-price">$6.500</span>
+                        </div>
+                    </div>
+                </div>
 
-      if (tipoDoc === 'Boleta' || tipoDoc === 'Factura') {
-        iva = Math.round(brutoTotal * 0.19 / 1.19);
-        netoTotal = Math.round(brutoTotal - iva);
-      }
+                <div class="menu-category-content hidden" id="bebidas">
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1509937172088-7566144e7c00?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Selección de Vinos del Valle del Maule">
+                        <div class="item-info">
+                            <h3>Selección de Vinos del Valle del Maule</h3>
+                            <p>Variedad de vinos tintos y blancos de viñas locales, por copa o botella.</p>
+                            <span class="item-price">Desde $4.000 / $18.000</span>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1534063229715-998f591f4a9b?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Coctelería de Autor">
+                        <div class="item-info">
+                            <h3>Coctelería de Autor</h3>
+                            <p>Clásicos reinventados y creaciones exclusivas con destilados premium.</p>
+                            <span class="item-price">Desde $8.500</span>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <img src="https://images.unsplash.com/photo-1549428073-61b601666611?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Jugos Naturales y Bebidas">
+                        <div class="item-info">
+                            <h3>Jugos Naturales y Bebidas</h3>
+                            <p>Variedad de jugos naturales de fruta fresca, gaseosas y agua mineral.</p>
+                            <span class="item-price">$2.800 / $1.500</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-      const ingresoTotal = Math.round(cantidad * precioVenta);
-      const margen = Math.round(ingresoTotal - brutoTotal); // C�lculo del margen sobre el bruto total
-      const margenPct = brutoTotal ? ((margen / brutoTotal) * 100).toFixed(0) : 0; // Porcentaje sobre el bruto total
+    <section class="section-padded bg-light" id="reservas">
+        <div class="container text-center">
+            <h2 class="section-heading">Reserva tu Mesa</h2>
+            <p class="section-subheading">Asegura tu lugar para una experiencia culinaria inolvidable.</p>
+            <div class="booking-section">
+                <div class="booking-image">
+                    <img src="img/restaurante.jpg" alt="Mesa de restaurante lista">
+                </div>
+                <div class="booking-form-container">
+                    <h3>Realiza tu Reserva</h3>
+                    <form class="reservation-form">
+                        <div class="form-group">
+                            <label for="res-name">Nombre:</label>
+                            <input type="text" id="res-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="res-email">Email:</label>
+                            <input type="email" id="res-email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="res-phone">Teléfono:</label>
+                            <input type="tel" id="res-phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="res-date">Fecha:</label>
+                            <input type="date" id="res-date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="res-time">Hora:</label>
+                            <input type="time" id="res-time" name="time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="res-guests">Número de Personas:</label>
+                            <input type="number" id="res-guests" name="guests" min="1" max="20" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
+                    </form>
+                    <p class="booking-note">Para grupos de más de 20 personas o eventos especiales, por favor contáctenos directamente.</p>
+                    </div>
+            </div>
+        </div>
+    </section>
 
-      sumCompras += netoTotal;
-      sumIngresos += ingresoTotal;
-      sumMargen += margen;
+    <section class="section-padded bg-dark text-white" id="about">
+        <div class="container about-content">
+            <h2 class="section-heading text-white">Nuestra Historia</h2>
+            <p class="section-subheading text-light-gray">Pasión por la gastronomía, desde el corazón de Talca.</p>
+            <div class="about-grid">
+                <div class="about-image">
+                    <img src="img/chef.jpg" alt="Chef de Unicar Talca">
+                </div>
+                <div class="about-text">
+                    <h3>Un Legado de Sabor</h3>
+                    <p>Unicar Talca nació de un sueño familiar en 2015, con la visión de crear un espacio donde la cocina chilena se encontrara con influencias globales. Nuestros fundadores, los hermanos Pérez, inspirados por sus viajes y el amor por los ingredientes locales, transformaron una antigua casona en el vibrante restaurante que es hoy.</p>
+                    <p>Nuestra filosofía culinaria se basa en el respeto por el producto, la innovación constante y la creencia de que cada plato debe contar una historia. Trabajamos con agricultores y productores locales para asegurar la frescura y sostenibilidad, y cada miembro de nuestro equipo comparte la pasión por ofrecer una experiencia excepcional.</p>
+                    <p>Más que un restaurante, Unicar es un punto de encuentro, un lugar donde las familias y amigos crean recuerdos alrededor de una buena mesa. ¡Te invitamos a ser parte de nuestra historia!</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-      const fila = document.createElement('tr');
-      fila.innerHTML = `
-        <td>${idAuto++}</td>
-        <td>${fecha}</td>
-        <td>${proveedor}</td>
-        <td>${producto}</td>
-        <td>${categoria}</td>
-        <td>${formatNumberWithCommas(cantidad)}</td>
-        <td>$${formatNumberWithCommas(Math.round(precioCompra))}</td>
-        <td>$${formatNumberWithCommas(Math.round(brutoTotal))}</td>
-        <td>$${formatNumberWithCommas(iva)}</td>
-        <td>$${formatNumberWithCommas(netoTotal)}</td>
-        <td>$${formatNumberWithCommas(Math.round(precioVenta))}</td>
-        <td>$${formatNumberWithCommas(ingresoTotal)}</td>
-        <td>$${formatNumberWithCommas(margen)}</td>
-        <td>${margenPct}%</td>
-        <td>${tipoDoc}</td>
-        <td>${notas}</td>
-      `;
-      tabla.appendChild(fila);
+    <section class="section-padded bg-light" id="testimonios">
+        <div class="container">
+            <h2 class="section-heading">Lo que Dicen Nuestros Clientes</h2>
+            <p class="section-subheading">Orgullosos de las experiencias que creamos.</p>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="quote">"¡Una joya en Talca! La comida es exquisita y el ambiente simplemente perfecto. El ceviche es un imperdible."</p>
+                    <span class="author">- Sofía M.</span>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="quote">"El lomo vetado estaba en su punto, y el risotto delicioso. La atención fue impecable. Volveremos sin duda."</p>
+                    <span class="author">- Carlos P.</span>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="quote">"Me encantó el ambiente y la coctelería de autor. ¡Un lugar ideal para una noche especial con amigos o pareja!"</p>
+                    <span class="author">- Andrea G.</span>
+                    <div class="rating">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <a href="#" class="btn btn-tertiary mt-5">Ver más reseñas</a>
+        </div>
+    </section>
 
-      totalCompras.textContent = formatNumberWithCommas(Math.round(sumCompras));
-      totalIngresos.textContent = formatNumberWithCommas(Math.round(sumIngresos));
-      totalMargen.textContent = formatNumberWithCommas(Math.round(sumMargen));
-    }
+    <section class="section-padded bg-dark text-white" id="especiales">
+        <div class="container text-center">
+            <h2 class="section-heading text-white">Especiales y Eventos</h2>
+            <p class="section-subheading text-light-gray">Siempre hay algo nuevo y emocionante en Unicar Talca.</p>
+            <div class="specials-grid">
+                <div class="special-card">
+                    <img src="https://images.unsplash.com/photo-1506354460061-6e9f19b2a6d7?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Happy Hour de Cocteles">
+                    <h3>Happy Hour de Cocteles</h3>
+                    <p>De Martes a Jueves, de 18:00 a 20:00 hrs. 2x1 en nuestra coctelería seleccionada.</p>
+                    <span class="date">¡Todo el mes de Julio!</span>
+                </div>
+                <div class="special-card">
+                    <img src="https://images.unsplash.com/photo-1543883839-a9a3b83b38a4?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Noche de Jazz en Vivo">
+                    <h3>Noche de Jazz en Vivo</h3>
+                    <p>Todos los viernes, disfruta de la mejor música jazz mientras cenas. Ambiente íntimo garantizado.</p>
+                    <span class="date">Viernes de 20:30 a 22:30 hrs</span>
+                </div>
+                 <div class="special-card">
+                    <img src="https://images.unsplash.com/photo-1594916843469-808801d9c12b?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Menú Degustación de Invierno">
+                    <h3>Menú Degustación de Invierno</h3>
+                    <p>Un recorrido por 7 tiempos con los sabores de la estación, maridado con vinos del Maule.</p>
+                    <span class="date">Disponible hasta fin de Agosto - ¡Reserva ahora!</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      agregarFila(
-        document.getElementById('producto').value,
-        parseFloat(document.getElementById('cantidad').value),
-        parseFloat(document.getElementById('precioCompra').value),
-        parseFloat(document.getElementById('precioVenta').value),
-        document.getElementById('tipoDoc').value,
-        document.getElementById('fecha').value,
-        document.getElementById('proveedor').value,
-        document.getElementById('categoria').value,
-        document.getElementById('notas').value
-      );
-      form.reset();
-      document.getElementById('producto').focus();
-    });
+    <section class="section-padded bg-light" id="contacto">
+        <div class="container">
+            <h2 class="section-heading">Visítanos y Contáctanos</h2>
+            <p class="section-subheading">Estamos aquí para servirte.</p>
 
-    function exportarExcel() {
-      let datos = [[
-        'ID', 'Fecha', 'Proveedor', 'Producto', 'Categor�a', 'Cantidad',
-        'Precio Compra Bruto', 'Bruto Total', 'IVA', 'Neto Total', 'Precio Venta',
-        'Ingreso Total', 'Margen', 'Margen %', 'Tipo Doc.', 'Notas']];
-      document.querySelectorAll('#tablaCompras tbody tr').forEach(tr => {
-        let fila = Array.from(tr.children).map(td => td.innerText.replace('$', '').replace('%', '').replace(/,/g, ''));
-        datos.push(fila);
-      });
-      let wb = XLSX.utils.book_new();
-      let ws = XLSX.utils.aoa_to_sheet(datos);
-      XLSX.utils.book_append_sheet(wb, ws, "Compras");
-      XLSX.writeFile(wb, "registro_compras.xlsx");
-    }
+            <div class="contact-info-map-grid">
+                <div class="contact-info">
+                    <h3>Unicar Talca</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> **Dirección:** Once Ote. 451, Talca, Región del Maule</p>
+                    <p><i class="fas fa-phone"></i> **Teléfono:** <a href="tel:+56712345678">+56 71 234 5678</a></p>
+                    <p><i class="fas fa-envelope"></i> **Email:** <a href="mailto:contacto@unicartalca.cl">contacto@unicartalca.cl</a></p>
+                    
+                    <h3>Horario de Atención:</h3>
+                    <ul>
+                        <li><i class="fas fa-clock"></i> **Lunes - Jueves:** 12:30 - 22:00 hrs</li>
+                        <li><i class="fas fa-clock"></i> **Viernes - Sábado:** 12:30 - 23:30 hrs</li>
+                        <li><i class="fas fa-clock"></i> **Domingo:** 13:00 - 17:00 hrs (Solo almuerzo)</li>
+                        <li><i class="fas fa-calendar-alt"></i> **Feriados:** Consultar horario especial</li>
+                    </ul>
+                    
+                    <div class="social-links">
+                        <a href="https://facebook.com/unicartalca" target="_blank" aria-label="Facebook de Unicar Talca"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://instagram.com/unicartalca" target="_blank" aria-label="Instagram de Unicar Talca"><i class="fab fa-instagram"></i></a>
+                        <a href="https://twitter.com/unicartalca" target="_blank" aria-label="Twitter de Unicar Talca"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1595.6983802996167!2d-71.123456!3d-33.456789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQzJzA4LjQiUyA3M8KwNDUnMzcuNyJX!5e0!3m2!1ses-419!2scl!4v1678901234567!5m2!1ses-419!2scl" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    function importarExcel(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const hoja = workbook.Sheets[workbook.SheetNames[0]];
-        const datos = XLSX.utils.sheet_to_json(hoja, { header: 1 });
-        datos.slice(1).forEach(fila => {
-          const [id, fecha, proveedor, producto, categoria, cantidad, precioCompra, , iva, netoTotal, precioVenta, ingresoTotal, margen, margenPct, tipoDoc, notas] = fila;
-          if (!isNaN(parseInt(id)) && parseInt(id) >= idAuto) {
-            idAuto = parseInt(id) + 1;
-          }
-          agregarFila(producto, parseFloat(cantidad), parseFloat(precioCompra), parseFloat(precioVenta), tipoDoc, fecha, proveedor, categoria, notas);
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <div class="footer-col">
+                <h4>Unicar Talca</h4>
+                <p>Experiencias culinarias únicas en el corazón del Maule. Tradición, innovación y pasión en cada plato.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="#home">Inicio</a></li>
+                    <li><a href="#menu">Menú</a></li>
+                    <li><a href="#reservas">Reservas</a></li>
+                    <li><a href="#about">Nosotros</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Información</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i>Once Ote. 451, Talca</li>
+                    <li><i class="fas fa-phone"></i> +56 71 234 5678</li>
+                    <li><i class="fas fa-envelope"></i> contacto@unicartalca.cl</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Unicar Talca. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinks = document.querySelector('.nav-links');
+
+            // Toggle del menú móvil
+            if (mobileMenu) {
+                mobileMenu.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+            }
+
+            // Cerrar menú móvil al hacer clic en un enlace
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+
+            // Lógica para cambiar categorías del menú
+            const categoryButtons = document.querySelectorAll('.menu-category-btn');
+            const menuContents = document.querySelectorAll('.menu-category-content');
+
+            if (categoryButtons.length > 0 && menuContents.length > 0) {
+                categoryButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        // Remover 'active' de todos los botones
+                        categoryButtons.forEach(btn => btn.classList.remove('active'));
+                        // Ocultar todas las categorías
+                        menuContents.forEach(content => content.classList.add('hidden'));
+
+                        // Añadir 'active' al botón clickeado
+                        button.classList.add('active');
+                        // Mostrar la categoría correspondiente
+                        const targetCategory = document.getElementById(button.dataset.category);
+                        if (targetCategory) {
+                            targetCategory.classList.remove('hidden');
+                        }
+                    });
+                });
+            }
         });
-      };
-      reader.readAsArrayBuffer(file);
-    }
-  </script>
+
+        // Script para el formulario de reservas (ejemplo de alerta)
+        document.querySelector('.reservation-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('¡Tu reserva ha sido enviada! Nos pondremos en contacto para confirmar.');
+            this.reset();
+        });
+    </script>
 </body>
 </html>
